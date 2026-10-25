@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
+import { useEffect, useState, useMemo } from 'react'
+import { motion, useScroll, useSpring, animate, useInView } from 'framer-motion'
+import { useRef } from 'react'
 
 export function Reveal({ children, delay = 0, y = 28, as = 'div', className = '', ...rest }) {
   const Tag = motion[as] || motion.div
@@ -85,4 +86,81 @@ export function WeddingToggle({ theme, setTheme, compact = false }) {
       ))}
     </div>
   )
+}
+
+export function ProgressBar() {
+  const { scrollYProgress } = useScroll()
+  const x = useSpring(scrollYProgress, { stiffness: 120, damping: 30 })
+  return <motion.div className="progress" style={{ scaleX: x }} />
+}
+
+/* confetti of gold petals when the theme changes */
+export function Burst({ trigger }) {
+  const parts = useMemo(
+    () => Array.from({ length: 46 }, (_, i) => ({
+      left: (i * 2.17 + (i % 7) * 3) % 100,
+      delay: (i % 12) * 0.05,
+      dur: 2.2 + ((i * 7) % 15) / 10,
+      size: 8 + ((i * 5) % 12),
+      rot: (i * 53) % 360,
+      drift: ((i * 31) % 160) - 80,
+      kind: i % 3,
+    })),
+    []
+  )
+  if (!trigger) return null
+  return (
+    <div className="burst" key={trigger} aria-hidden="true">
+      {parts.map((p, i) => (
+        <i key={i} className={`k${p.kind}`} style={{ left: `${p.left}%`, width: p.size, height: p.size * 1.3, animationDelay: `${p.delay}s`, animationDuration: `${p.dur}s`, '--rot': `${p.rot}deg`, '--drift': `${p.drift}px` }} />
+      ))}
+    </div>
+  )
+}
+
+/* tiny gold stars trailing the pointer (fine pointers only) */
+export function CursorTrail() {
+  useEffect(() => {
+    if (!window.matchMedia('(pointer: fine)').matches || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    let last = 0
+    const on = (e) => {
+      const now = performance.now()
+      if (now - last < 45) return
+      last = now
+      const el = document.createElement('span')
+      el.className = 'trail'
+      el.style.left = e.clientX + 'px'
+      el.style.top = e.clientY + 'px'
+      el.style.setProperty('--dx', (Math.random() * 40 - 20) + 'px')
+      el.style.setProperty('--s', 6 + Math.random() * 8 + 'px')
+      document.body.appendChild(el)
+      setTimeout(() => el.remove(), 900)
+    }
+    window.addEventListener('pointermove', on, { passive: true })
+    return () => window.removeEventListener('pointermove', on)
+  }, [])
+  return null
+}
+
+export function Marquee({ items }) {
+  const row = [...items, ...items]
+  return (
+    <div className="marquee" aria-hidden="true">
+      <div className="marquee-track">
+        {row.concat(row).map((t, i) => <span key={i}>{t}<i>✦</i></span>)}
+      </div>
+    </div>
+  )
+}
+
+export function Counter({ to }) {
+  const ref = useRef(null)
+  const inView = useInView(ref, { once: true })
+  const [v, setV] = useState(0)
+  useEffect(() => {
+    if (!inView) return
+    const c = animate(0, to, { duration: 1.6, ease: 'easeOut', onUpdate: (x) => setV(Math.round(x)) })
+    return () => c.stop()
+  }, [inView, to])
+  return <b ref={ref}>{v}</b>
 }

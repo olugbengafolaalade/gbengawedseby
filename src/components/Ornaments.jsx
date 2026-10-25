@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { motion } from 'framer-motion'
 
 /* ---------- Traditional: dark filigree corner (drawn in currentColor) ---------- */
 const leaf = (x, y, r, s = 1) => (
@@ -151,8 +152,42 @@ export function Petals({ count = 14 }) {
 
 export function Divider() {
   return (
-    <div className="divider" aria-hidden="true">
-      <span /><svg viewBox="0 0 40 24" width="40" height="24"><path d="M20 2 C 26 8, 26 16, 20 22 C 14 16, 14 8, 20 2 Z M4 12 C 10 6, 14 8, 17 12 C 14 16, 10 18, 4 12 Z M36 12 C 30 6, 26 8, 23 12 C 26 16, 30 18, 36 12 Z" fill="currentColor"/></svg><span />
-    </div>
+    <motion.div className="divider" aria-hidden="true" initial="h" whileInView="v" viewport={{ once: true }}>
+      <motion.span variants={{ h: { scaleX: 0 }, v: { scaleX: 1 } }} transition={{ duration: 1, ease: 'easeOut' }} style={{ originX: 1 }} />
+      <motion.svg viewBox="0 0 40 24" width="40" height="24" variants={{ h: { scale: 0, rotate: -90 }, v: { scale: 1, rotate: 0 } }} transition={{ duration: 0.9, delay: 0.3, type: 'spring' }}>
+        <path d="M20 2 C 26 8, 26 16, 20 22 C 14 16, 14 8, 20 2 Z M4 12 C 10 6, 14 8, 17 12 C 14 16, 10 18, 4 12 Z M36 12 C 30 6, 26 8, 23 12 C 26 16, 30 18, 36 12 Z" fill="currentColor" />
+      </motion.svg>
+      <motion.span variants={{ h: { scaleX: 0 }, v: { scaleX: 1 } }} transition={{ duration: 1, ease: 'easeOut' }} style={{ originX: 0 }} />
+    </motion.div>
+  )
+}
+
+/* Text running around a circle, slowly rotating */
+export function RingText({ text, className = '', size = 200 }) {
+  const id = useMemo(() => 'ring' + Math.random().toString(36).slice(2, 7), [])
+  return (
+    <svg className={`ring-text ${className}`} viewBox="0 0 200 200" width={size} height={size} aria-hidden="true">
+      <defs><path id={id} d="M100,100 m-70,0 a70,70 0 1,1 140,0 a70,70 0 1,1 -140,0" /></defs>
+      <text><textPath href={`#${id}`} startOffset="0" textLength="436" lengthAdjust="spacing">{text}</textPath></text>
+    </svg>
+  )
+}
+
+/* Shared clip-paths for photo shapes */
+export function ClipDefs() {
+  return (
+    <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
+      <defs>
+        <clipPath id="clip-heart" clipPathUnits="objectBoundingBox">
+          <path d="M0.5,0.94 C0.08,0.64 -0.04,0.34 0.14,0.14 C0.28,-0.01 0.45,0.05 0.5,0.22 C0.55,0.05 0.72,-0.01 0.86,0.14 C1.04,0.34 0.92,0.64 0.5,0.94 Z" />
+        </clipPath>
+        <clipPath id="clip-blob" clipPathUnits="objectBoundingBox">
+          <path d="M0.82,0.12 C0.98,0.28 1.02,0.6 0.88,0.80 C0.74,1.0 0.4,1.04 0.2,0.9 C0.0,0.76 -0.04,0.44 0.1,0.24 C0.24,0.04 0.6,-0.06 0.82,0.12 Z" />
+        </clipPath>
+        <clipPath id="clip-scallop" clipPathUnits="objectBoundingBox">
+          <path d="M0.5,0 C0.58,0 0.62,0.06 0.7,0.08 C0.78,0.1 0.86,0.08 0.9,0.14 C0.94,0.2 0.92,0.28 0.95,0.35 C0.98,0.42 1,0.46 1,0.5 C1,0.54 0.98,0.58 0.95,0.65 C0.92,0.72 0.94,0.8 0.9,0.86 C0.86,0.92 0.78,0.9 0.7,0.92 C0.62,0.94 0.58,1 0.5,1 C0.42,1 0.38,0.94 0.3,0.92 C0.22,0.9 0.14,0.92 0.1,0.86 C0.06,0.8 0.08,0.72 0.05,0.65 C0.02,0.58 0,0.54 0,0.5 C0,0.46 0.02,0.42 0.05,0.35 C0.08,0.28 0.06,0.2 0.1,0.14 C0.14,0.08 0.22,0.1 0.3,0.08 C0.38,0.06 0.42,0 0.5,0 Z" />
+        </clipPath>
+      </defs>
+    </svg>
   )
 }

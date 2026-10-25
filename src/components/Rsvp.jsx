@@ -52,7 +52,7 @@ export default function Rsvp({ theme }) {
         <p className="eyebrow">Kindly respond</p>
         <h2 className="display">RSVP</h2>
         <Divider />
-        <p className="lede">Tell us which celebration(s) you’ll be joining — it helps us make sure there is a seat, a plate and a dance with your name on it.</p>
+        <p className="lede">Kindly reply by <b>1 December</b> (Traditional) or <b>15 December</b> (White Wedding). Tell us which celebration(s) you’ll be joining — it helps us make sure there is a seat, a plate and a dance with your name on it.</p>
       </Reveal>
 
       <Reveal className="form-wrap">
@@ -77,7 +77,7 @@ export default function Rsvp({ theme }) {
                     <label>
                       <input type="checkbox" checked={f.events[w.id]} onChange={() => toggleEvent(w.id)} />
                       <span className="event-name">{w.title}</span>
-                      <span className="event-meta">{w.dateLabel} · {w.city}</span>
+                      <span className="event-meta">{w.dateLabel} · {w.city}<br /><em>Kindly reply by {w.deadline}</em></span>
                     </label>
                     {f.events[w.id] && (
                       <div className="seg">
